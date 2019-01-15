@@ -19,17 +19,17 @@ LICENSE="GPL-3"
 
 SLOT="0"
 KEYWORDS="amd64 x86 ~amd64-linux"
-IUSE="python selinux tests"
-selinux? ( s
-DEPEND=""
-RDEPEND=""
+IUSE="python"
+BDEPEND=""
+RDEPEND="
+dev-libs/yajl
+"
 src_prepare() {
 	default
 	eautoreconf
 }
 src_configure() {
 	econf $(use_enable python with-python-bindings)
-	selinux? ( s
 }
 
 src_compile() {
@@ -41,7 +41,6 @@ src_install() {
 	emake DESTDIR="${ED}" PREFIX="/usr" \
 		libdir="/usr/$(get_libdir)" install
 	#TODO, going to bed: python_foreach_impl configure has PYTHON_VERSION
-	dobin crun
 	dodoc README.md
 	dodoc COPYING.libcrun
 }
