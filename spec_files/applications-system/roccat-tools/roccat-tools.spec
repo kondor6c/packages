@@ -1,21 +1,26 @@
 Name: roccat
 Version: 5.9.0
-Release: 1
+Release: 2
 License: GPL
 Source: https://sourceforge.net/projects/roccat/files/roccat-tools/roccat-tools-%{version}.tar.bz2
+Patch0: fix-multiple-definitions.patch
 BuildRequires: gtk2-devel >= 2.20
 BuildRequires: cmake >= 2.6.4
 BuildRequires: dbus-glib
 BuildRequires: dbus-glib-devel
 BuildRequires: libgudev1-devel
 BuildRequires: libX11-devel
+# BuildRequires: pkgconfig(dbus-glib) >= 0.110
+# BuildRequires: pkgconfig(libgudev1) >= 234
+# BuildRequires: pkgconfig(libX11) >= 1.6.12
 BuildRequires: libgaminggear-devel >= 0.15.1
-BuildRequires: lua-devel >= %{luaversion}
+BuildRequires: pkgconfig(lua) >= %{luaversion}
 BuildRequires: gettext >= 0.15
 ExclusiveOS: linux
 URL: http://roccat.sourceforge.net
 
 %global debug_package %{nil}
+%global _default_patch_fuzz 2
 
 %define default_udevdir /lib/udev/rules.d
 %{!?udevdir: %define udevdir %{default_udevdir}}
@@ -26,7 +31,7 @@ URL: http://roccat.sourceforge.net
 %define default_gfx_plugindir %{_libdir}/gaminggear_plugins
 %{!?gfx_plugindir: %define gfx_plugindir %{default_gfx_plugindir}}
 
-%define default_luaversion 5.3
+%define default_luaversion 5.4
 %{!?luaversion: %define luaversion %{default_luaversion}}
 
 Summary: Roccat common files
@@ -265,9 +270,10 @@ manipulate the Profiles and Settings of a Roccat Tyon mouse.
 
 %prep
 %setup -q -n roccat-tools-%{version}
+%patch0 -p1
 %{__mkdir} build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%{_prefix}" -DLIBDIR="%{_libdir}" -DUDEVDIR="%{udevdir}" -DEVENTHANDLER_PLUGIN_DIR="%{eventhandlerdir}" -DWITH_LUA=%{luaversion} ..
+CFLAGS="-isystem /usr/include/harfbuzz" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%{_prefix}" -DLIBDIR="%{_libdir}" -DUDEVDIR="%{udevdir}" -DEVENTHANDLER_PLUGIN_DIR="%{eventhandlerdir}" -DWITH_LUA="5.4" -DWITH_LUA=%{luaversion} ..
 
 %build
 cd build
@@ -682,21 +688,8 @@ gtk-update-icon-cache %{_prefix}/share/icons/hicolor &>dev/null || :
 %{_mandir}/*/man1/roccattyon*
 
 %changelog
-* Sat Apr 13 2019 Stefan Achatz <erazor_de@users.sourceforge.net> 5.9.0
-  
- - Improved: Lua (the language) finder now handles version and release numbers
- - Improved: Specfile
- - Improved: RyosMKFX better gamma correction
- - Added: RyosMKFX notification settings
- - Fixed: RyosMKFX false modified profiles leading to unnecessary writes
- - Fixed: Sova & Skeltr add new profile lost settings
- - Fixed: Sova open application opened driver instead
- - Fixed: Double audio notification on profile change when configuration GUI is running
-
-* Fri Mar 29 2019 Stefan Achatz <erazor_de@users.sourceforge.net> 5.8.0
-
- - Improved: Switch to default profile now works if no window is active
- - Fixed: Sova macro write
- - Fixed: Sova rkp import
+* Fri Apr 23 2021 Kevin Faulkner <kondor6c@lazytree.us> 5.7.0-2
+- altered spec file for Fedora 33, new Lua version, pangolibs
+- patch from Stefan ryos build issue https://aur.archlinux.org/pkgbase/roccat-tools/#comment-753814
 * Tue Jun 13 2017 Stefan Achatz <erazor_de@users.sourceforge.net> 5.7.0-1
 - Initial version

@@ -13,6 +13,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-build
 BuildRequires: cmake >= 2.6.4
 BuildRequires: gtk2-devel >= 2.20
 BuildRequires: sqlite >= 3.7
+BuildRequires: pkgconfig(harfbuzz) >= 2.0.0
 BuildRequires: libcanberra-devel
 BuildRequires: libnotify-devel
 BuildRequires: doxygen
@@ -42,7 +43,7 @@ Here are the development headers needed to compile software that uses libgamingg
 %setup -q -n %{name}-%{version}
 %{__mkdir} build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX="%{_prefix}" -DCMAKE_BUILD_TYPE=Release -DINSTALL_LIBDIR="%{_libdir}" -DWITH_DOC=TRUE ..
+CFLAGS="-isystem /usr/include/harfbuzz" cmake -DCMAKE_INSTALL_PREFIX="%{_prefix}" -DCMAKE_BUILD_TYPE=Release -DINSTALL_LIBDIR="%{_libdir}" -DWITH_DOC=TRUE ..
 
 %build
 cd build
@@ -87,5 +88,7 @@ gtk-update-icon-cache %{prefix}/share/icons/hicolor &>dev/null || :
 %{_datadir}/cmake/Modules/FindGAMINGGEAR%{vmajor}.cmake
 
 %changelog
+* Fri Apr 23 2021 Kevin Faulkner <kondor6c@lazytree.us> 0.15.1-2
+- Initial version
 * Fri Jun 09 2016 Stefan Achatz <erazor_de@users.sourceforge.net> 0.15.1-1
 - Initial version
